@@ -94,14 +94,20 @@ learner.loss_func                               ## shows the loss func used. (he
 learner.fit_one_cycle(cyc_len=epochs, max_lr=slice(1e-3, 1e-1))     ## training the last layers of flexNet ONLY
 
 learner.recorder.plot_losses()                  ## plot the train & valid losses
-learner.recoder.plot_metrics()                  ## plot the metrics (here, accuracy_thresh)
+learner.recorder.plot_metrics()                 ## plot the metrics (here, accuracy_thresh)
 learner.show_results()                          ## results from the validation dataset showing the true & predicted labels
 learner.save("stage-1")
 
-## Unfreezing all the layers of pretrained resnet, to train it on our dataset after tuning last layers
-
-
 ## Step-5: Analyze the train/valid losses and retrain the neuralNet
+## Unfreezing all the layers of pretrained resnet, to train it on our dataset after tuning last layers
+learner.unfreeze()
+learner.lr_find()                               ## find suitable lr range for training all the layers NOW
+learner.recorder.plot()
+learner.fit_one_cycle(cyc_len=epochs, max_lr=slice(1e-6, 1e-3))     ## using the same earlier lr range to train all the layers now
+                                                                    ## max_lr range here is obtained after analyzing the lr_find plot
 
-## Step-6: Freeze the training process, test the trained parameters and analyze the decision metrics
+learner.recorder.plot_losses()
+learner.recorder.plot_metrics()
+learner.save("stage-2")                         ## SAVING THE TRAINED MODEL
+
 
