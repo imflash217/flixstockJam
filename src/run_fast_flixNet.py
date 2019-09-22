@@ -73,14 +73,14 @@ data = (src.transform(transforms)               ## transforms like flip, rotate,
 gc.collect                                      ## garbage collection to release memory
 
 ## Step-3: Load the neuralNet architecture & defining the metrics before creating a learner
-flexNet_arch = models.resnet50                  ## downloading the arch and its pretrained parameters
+flixNet_arch = models.resnet50                  ## downloading the arch and its pretrained parameters
 
-## defining the evaluation metrics (but its not used for training rather only for us to judge the performance of flexNet)
+## defining the evaluation metrics (but its not used for training rather only for us to judge the performance of flixNet)
 ## As, no metric is suggested in the problem statement, I'm using thresholded accuracy
-metric = partial(accuracy_thresh, thresh=0.1)   ## Decinding upon what threshold to use will require more experiments on this dataset & flexNet
+metric = partial(accuracy_thresh, thresh=0.1)   ## Decinding upon what threshold to use will require more experiments on this dataset & flixNet
 
 ## Step-4: Train the neuralNet arch
-learner = cnn_learner(data, flexNet_arch, metrics=metric)
+learner = cnn_learner(data, flixNet_arch, metrics=metric)
 print(learner)                                  ## displays the whole learner arch & loss function
                                                 ## inherently I am using BCEWithLogitsLoss as loss criterion
                                                 ## b'coz its serves the purpose of multilabel classification unlike BCE (BinaryCssEntropy) loss
@@ -89,9 +89,9 @@ learner.lr_find()                               ## superb method to decide upon 
 learner.recorder.plot()                         ## plots the lrs against the loss generated. Use it to decide the range of lr.
 learner.loss_func                               ## shows the loss func used. (here, BCEWithLogitsLoss)
 
-## I'm using cyclical training starategy developed by Leslie Smith, with distributed learning rates across the layers of flexNet
-## Currently the flexNet layers are frozen except for last layer added to pretrained resnet to suit out multi-hot-encoded labels
-learner.fit_one_cycle(cyc_len=epochs, max_lr=slice(1e-3, 1e-1))     ## training the last layers of flexNet ONLY
+## I'm using cyclical training starategy developed by Leslie Smith, with distributed learning rates across the layers of flixNet
+## Currently the flixNet layers are frozen except for last layer added to pretrained resnet to suit out multi-hot-encoded labels
+learner.fit_one_cycle(cyc_len=epochs, max_lr=slice(1e-3, 1e-1))     ## training the last layers of flixNet ONLY
 
 learner.recorder.plot_losses()                  ## plot the train & valid losses
 learner.recorder.plot_metrics()                 ## plot the metrics (here, accuracy_thresh)
