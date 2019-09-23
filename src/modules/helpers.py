@@ -10,6 +10,14 @@ __author__ = "Vinay Kumar"
 __copyright__ = "@vinaykumar2491, 2019"
 __project__ = "flixstockJam"
 
+def remove_ghost_data(df:pd.DataFrame=None, data_path:pathlib.Path=None, inplace:bool=True, col=None):
+    for x in df[col]:
+        if not (data_path/x).exists():
+            df.drop(df[df[col] == x].index, inplace=inplace)
+    if inplace:
+        return None
+    else:
+        return df
 
 def preprocess_from_csv(data_path: pathlib.Path=None, attr_path: pathlib.Path=None,
                         data_augmentation: bool=False, multilabel_classification: bool=False,
@@ -58,11 +66,3 @@ def preprocess_from_csv(data_path: pathlib.Path=None, attr_path: pathlib.Path=No
     remove_ghost_data(df, data_path, inplace=True, col=img_col)
     return df
 
-def remove_ghost_data(df:pd.DataFrame=None, data_path:pathlib.Path=None, inplace:bool=True, col=None):
-    for x in df[col]:
-        if not (data_path/x).exists():
-            df.drop(df[df[col] == x].index, inplace=inplace)
-    if inplace:
-        return None
-    else:
-        return df
