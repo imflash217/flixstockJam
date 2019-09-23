@@ -32,8 +32,9 @@ data_path = f"{root_path}/images"
 attr_csv_path = f"{root_path}/attributes.csv"
 
 if data_preprocessing:
-    helpers.preprocess(data_path=data_path, attr_path=attr_csv_path, data_augmentation=False,
-                        multilabel_classification=True, target_attr="attr")
+helpers.preprocess_from_csv(data_path=data_path, attr_path=attr_csv_path, data_augmentation=False,
+                        multilabel_classification=True, target_attr="attr", multilabel_start=1,
+                        multilabel_end=4, multilabel_delim=" : ")
 
 if do_training:
     ## Step-1: Preparing the training and validation dataset
