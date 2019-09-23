@@ -67,14 +67,20 @@ def preprocess_from_csv(data_path: pathlib.Path=None, attr_path: pathlib.Path=No
     img_col = df.columns[0]
     # df.drop(df[df.filename=="11495010560702-The-Indian-Garage-Co-Men-Tshirts-7851495010560569-2.jpg"].index, inplace=True)
     remove_ghost_data(df, data_path, inplace=True, col=img_col)
-    return df
+    all_label_types = np.array([])
+    if multilabel_classification:
+        for i in df.columns[multilabel_start:multilabel_end]:
+            all_label_types = np.concatenate((all_label_types, df[i].unique()))
+        all_label_types = sorted(all_label_types)
+
+    return (df, all_label_types)
+
 
 def create_embeddings(label: str, all_label_types, delim: str):
     label = label.split(delim)
     label_embedding = np.zeros(all_label_types.size, dtype=int)
     for i in label:
         label_embedding[np.where(all_label_types==i)] = 1
-
 
 
 class FlixDataset(torch.utils.data.Dataset):
