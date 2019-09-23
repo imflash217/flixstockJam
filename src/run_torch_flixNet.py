@@ -34,11 +34,13 @@ attr_csv_path = pathlib.Path(f"{root_path}/attributes.csv")
 
 df = pd.DataFrame()
 if data_preprocessing:
-    df = helpers.preprocess_from_csv(data_path=data_path, attr_path=attr_csv_path, data_augmentation=False,
+    print(f"##-----------------\nPreprocesssing starting...\n##-----------------")
+    df, all_label_types = helpers.preprocess_from_csv(data_path=data_path, attr_path=attr_csv_path, data_augmentation=False,
                         multilabel_classification=True, target_attr="attr", multilabel_start=1,
                         multilabel_end=4, multilabel_delim=" : ")
-## convert the input and labels into tensors
-
+    print(all_label_types)
+    print(df.head())
+    print(f"##-----------------\nPreprocesssing done.\n##-----------------")
 
 if do_training:
     ## Step-1: Preparing the training and validation dataset

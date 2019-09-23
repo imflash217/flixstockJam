@@ -111,4 +111,6 @@ class FlixDataset(torch.utils.data.Dataset):
         label = create_embeddings(label=self.df[self.target_col][idx], all_label_types=self.all_label_types, delim=self.delim)
         input_tensor = TF.to_tensor(input_img).to(self.device)
         label_tensor = torch.from_numpy(label).to(self.device)
+        if idx == 0:
+            print(input_tensor.shape, label_tensor.shape, label_tensor)
         return {"input": input_tensor, "label": label_tensor}
