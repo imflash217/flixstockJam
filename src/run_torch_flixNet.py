@@ -11,6 +11,7 @@ import torch
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import pathlib
 
 from modules import helpers
 from modules import data
@@ -27,12 +28,12 @@ print(f"Running on {device}")
 data_preprocessing = True
 do_training = True
 do_testing = False
-root_path = f"../../data"
-data_path = f"{root_path}/images"
-attr_csv_path = f"{root_path}/attributes.csv"
+root_path = pathlib.Path(f"../../data")
+data_path = pathlib.Path(f"{root_path}/images")
+attr_csv_path = pathlib.Path(f"{root_path}/attributes.csv")
 
 if data_preprocessing:
-helpers.preprocess_from_csv(data_path=data_path, attr_path=attr_csv_path, data_augmentation=False,
+    helpers.preprocess_from_csv(data_path=data_path, attr_path=attr_csv_path, data_augmentation=False,
                         multilabel_classification=True, target_attr="attr", multilabel_start=1,
                         multilabel_end=4, multilabel_delim=" : ")
 

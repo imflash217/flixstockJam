@@ -4,18 +4,18 @@ Helper functions to do data cleaning, preprocessing and postprocessing
 
 import torch
 import pandas as pd
+import pathlib
 
 __author__ = "Vinay Kumar"
 __copyright__ = "@vinaykumar2491, 2019"
 __project__ = "flixstockJam"
 
 
-def preprocess_from_csv(data_path: str=None, attr_path: str=None, data_augmentation: bool=False,
-                        multilabel_classification: bool=False, target_attr: str=None,
-                        multilabel_start: int=1, multilabel_end: int=4, multilabel_delim: str=" : "
-                        ) -> pd.DataFrame:
+def preprocess_from_csv(data_path: pathlib.Path=None, attr_path: pathlib.Path=None,
+                        data_augmentation: bool=False, multilabel_classification: bool=False,
+                        target_attr: str=None, multilabel_start: int=1, multilabel_end: int=4,
+                        multilabel_delim: str=" : ") -> pd.DataFrame:
     ## Step-1: Load and analyze the database
-    # data_path = Path(f"../../data")     ## This has type PosixPath which is conveniently interpreted by pandas, fastai, pytorch.
     df = pd.read_csv(attr_path)
     print(f"{df.head()}")               ## viewing and analyzing the provided data/labels & its structure
 
@@ -53,21 +53,16 @@ def preprocess_from_csv(data_path: str=None, attr_path: str=None, data_augmentat
                 df[target_attr] = df[target_attr] + multilabel_delim + df[i]
 
     ## Sanity check: remove the files from csv that donot exist in images
-    df.drop(df[df.filename=="11495010560702-The-Indian-Garage-Co-Men-Tshirts-7851495010560569-2.jpg"].index, inplace=True)
+    img_col = df.columns[0]
+    # df.drop(df[df.filename=="11495010560702-The-Indian-Garage-Co-Men-Tshirts-7851495010560569-2.jpg"].index, inplace=True)
+    remove_ghost_data(df, data_path, inplace=True, col=img_col)
     return df
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def remove_ghost_data(df:pd.DataFrame=None, data_path:pathlib.Path=None, inplace:bool=True, col=None):
+    for x in df[col]:
+        if not (data_path/x).exists():
+            df.drop(df[df[col] == x].index, inplace=inplace)
+    if inplace:
+        return None
+    else:
+        return df
