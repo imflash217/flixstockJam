@@ -104,7 +104,7 @@ class FlixDataset(torch.utils.data.Dataset):
         self.delim = delim
 
     def __len__(self):
-        return len(self.df[in_col])
+        return len(self.df[self.in_col])
 
     def __getitem__(self, idx):
         input_img = Image.open(self.data_path/self.df[self.in_col][idx])
