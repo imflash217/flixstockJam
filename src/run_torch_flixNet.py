@@ -32,10 +32,13 @@ root_path = pathlib.Path(f"../../data")
 data_path = pathlib.Path(f"{root_path}/images")
 attr_csv_path = pathlib.Path(f"{root_path}/attributes.csv")
 
+df = pd.DataFrame()
 if data_preprocessing:
-    helpers.preprocess_from_csv(data_path=data_path, attr_path=attr_csv_path, data_augmentation=False,
+    df = helpers.preprocess_from_csv(data_path=data_path, attr_path=attr_csv_path, data_augmentation=False,
                         multilabel_classification=True, target_attr="attr", multilabel_start=1,
                         multilabel_end=4, multilabel_delim=" : ")
+## convert the input and labels into tensors
+
 
 if do_training:
     ## Step-1: Preparing the training and validation dataset

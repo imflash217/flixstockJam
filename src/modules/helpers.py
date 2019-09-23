@@ -3,8 +3,11 @@ Helper functions to do data cleaning, preprocessing and postprocessing
 """
 
 import torch
+import torchvision.transforms.functional as TF
+from PIL import Image
 import pandas as pd
 import pathlib
+import numpy as np
 
 __author__ = "Vinay Kumar"
 __copyright__ = "@vinaykumar2491, 2019"
@@ -66,3 +69,40 @@ def preprocess_from_csv(data_path: pathlib.Path=None, attr_path: pathlib.Path=No
     remove_ghost_data(df, data_path, inplace=True, col=img_col)
     return df
 
+def create_embeddings(label: str, all_label_types, delim: str):
+    label = label.split(delim)
+    label_embedding = np.zeros(all_label_types.size, dtype=int)
+    for i in label:
+        label_embedding[np.where(all_label_types==i)] = 1
+
+
+
+class FlixDataset(torch.utils.data.Dataset):
+    """
+    Custom dataset for flexNet task.
+    """
+
+    def __init__(self, df, data_path, in_col, target_col, device, all_label_types, delim):
+        """
+        Inputs:
+        - df          [type=str] : path of the csv file which contains the information about the data
+        - root_dir    [type=str] : path of the directory with all input data
+        """
+
+        self.df = df
+        self.data_path = data_path
+        self.in_col = in_col
+        self.target_col = target_col
+        self.device = device
+        self.all_label_types = all_label_types
+        self.delim = delim
+
+    def __len__(self):
+        return len(self.df[in_col])
+
+    def __getitem__(self, idx):
+        input_img = Image.open(self.data_path/self.df[self.in_col][idx])
+        label = create_embeddings(label=self.df[self.target_col][idx], all_label_types=self.all_label_types, delim=self.delim)
+        input_tensor = TF.to_tensor(input_img).to(self.device)
+        label_tensor = torch.from_numpy(label).to(self.device)
+        return {"input": input_tensor, "label": label_tensor}
