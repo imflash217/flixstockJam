@@ -71,16 +71,20 @@ def preprocess_from_csv(data_path: pathlib.Path=None, attr_path: pathlib.Path=No
     if multilabel_classification:
         for i in df.columns[multilabel_start:multilabel_end]:
             all_label_types = np.concatenate((all_label_types, df[i].unique()))
-        all_label_types = sorted(all_label_types)
+        all_label_types = np.array(sorted(all_label_types))
 
     return (df, all_label_types)
 
 
 def create_embeddings(label: str, all_label_types, delim: str):
     label = label.split(delim)
-    label_embedding = np.zeros(all_label_types.size, dtype=int)
+    label_embedding = np.zeros(len(all_label_types))
+    # print(all_label_types, type(all_label_types))
+    # print(label, type(label))
     for i in label:
+        # print(type(i) == type(all_label_types[0]))
         label_embedding[np.where(all_label_types==i)] = 1
+    return label_embedding
 
 
 class FlixDataset(torch.utils.data.Dataset):
@@ -112,5 +116,15 @@ class FlixDataset(torch.utils.data.Dataset):
         input_tensor = TF.to_tensor(input_img).to(self.device)
         label_tensor = torch.from_numpy(label).to(self.device)
         if idx == 0:
+            print("label_tensor", label_tensor)
             print(input_tensor.shape, label_tensor.shape, label_tensor)
         return {"input": input_tensor, "label": label_tensor}
+
+
+def weights_init(model):
+    """
+    Initializes the weights and bias of the the network using Xavier Initialization
+    """
+    if isinstance(model, torch.nn.Conv2d):
+        torch.nn.init.xavier_uniform_(model.weight)
+        print(f'weights initialized as per "Xavier Initialization Rule"')

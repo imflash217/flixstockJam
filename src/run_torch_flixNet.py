@@ -39,7 +39,7 @@ train_split = 0.7
 valid_split = 0.2
 test_split = 0.1
 test_ds = None
-bs = 16
+bs = 2
 epochs = 5
 torch.manual_seed(217)          ## setting seed for Pytorch RNG
 
@@ -83,7 +83,8 @@ if do_training:
     ## Step-4: Training and validating the flixNet
 
     for lr in learning_rates:
-        flixnet = flixNet.flixnet()
+        flixnet = flixNet.FlixNet()
+        flixnet.apply(helpers.weights_init)         ## initializing the parameters of flixnet
         # initialize wights if using an untrained arch otherwise not
         if torch.cuda.is_available():
             flixnet.cuda()
@@ -100,12 +101,18 @@ if do_training:
             count = 0
             for _, sampled_batch in enumerate(train_dl):
                 input_batch = sampled_batch["input"]
+                input_batch = input_batch.float().view(-1,3,300,225)
+                # print(input_batch.shape)
                 label_batch = sampled_batch["label"]
+                label_batch = label_batch.float().view(-1,21)
+
                 if torch.cuda.is_available():
                     input_batch = input_batch.cuda()
                     label_batch = label_batch.cuda()
                 optimizer.zero_grad()
-                loss = loss_criterion(flixnet(input_batch), label_batch)
+                pred_batch = flixnet(input_batch)
+                print(pred_batch.shape, label_batch)
+                loss = loss_criterion(pred_batch, label_batch)
                 run_loss += loss.item()
                 loss.backward()
                 optimizer.step()
@@ -117,15 +124,6 @@ if do_training:
         ## Step-6: Saving the model, so as to be used during testing.
         torch.save(flixnet, model_dir/f"{lr}.model")
         print(f"Trained model saved at {model_dir}/{lr}.model")
-
-
-if do_testing:
-    ## Step-1: Prepare the test dataset
-    ## Step-2: Load the pretrained model
-    ## Step-3: Define the evaluation metrics
-    ## Step-5: Test the pretrained model against test dataset
-    ## Step-6: Record the results
-    pass
 
 
 
